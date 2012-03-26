@@ -15,7 +15,7 @@ pkgname=ruby-$_gemname
 pkgver=<%= gem_ver %>
 pkgrel=1
 pkgdesc="<%= description %>"
-arch=('i686' 'x86_64')
+arch=(<%= arch %>)
 url="<%= website %>"
 license=('<%= license %>')
 depends=('ruby'<%= depends %>)
@@ -81,6 +81,11 @@ def gen_pkgbuild(spec)
   website = spec.homepage
   description = spec.summary
   license = spec.license
+  arch = if spec.extensions.empty?
+    "'any'"
+  else
+    "'i686' 'x86_64'"
+  end
 
   md5sum = calc_digest(spec.full_name + '.gem', :MD5)
   sha1sum = calc_digest(spec.full_name + '.gem', :SHA1)
