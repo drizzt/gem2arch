@@ -25,10 +25,10 @@ noextract=($_gemname-$pkgver.gem)
 md5sums=('<%= md5sum %>')
 sha1sums=('<%= sha1sum %>')
 
-build() {
-  cd $srcdir
+package() {
+  cd "$srcdir"
   local _gemdir="$(ruby -e'puts Gem.default_dir')"
-  gem install --ignore-dependencies -i "$pkgdir$_gemdir" $_gemname-$pkgver.gem
+  gem install --ignore-dependencies --no-user-install -i "$pkgdir$_gemdir" $_gemname-$pkgver.gem
 }
 }
 
