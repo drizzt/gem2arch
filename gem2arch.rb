@@ -2,6 +2,7 @@
 
 require 'date'
 require 'digest/md5'
+require 'digest/sha1'
 require 'erb'
 require 'fileutils'
 require 'rubygems'
@@ -22,6 +23,7 @@ makedepends=('rubygems')
 source=(http://rubygems.org/downloads/$_gemname-$pkgver.gem)
 noextract=($_gemname-$pkgver.gem)
 md5sums=('<%= md5sum %>')
+sha1sums=('<%= sha1sum %>')
 
 build() {
   cd $srcdir
@@ -55,17 +57,21 @@ def download(gem_name, gem_ver = nil)
   return spec
 end
 
-def calc_digest(file_name)
-  md5sum = Digest::MD5.new
+def calc_digest(file_name, type)
+  if type == :MD5
+    sum = Digest::MD5.new
+  elsif type == :SHA1
+    sum = Digest::SHA1.new
+  end
   file_size = File.size file_name
 
   File.open(file_name) do |f|
     while buf = f.read(1024)
-      md5sum << buf
+      sum << buf
     end
   end
 
-  return md5sum.to_s
+  return sum.to_s
 end
 
 def gen_pkgbuild(spec)
@@ -76,7 +82,8 @@ def gen_pkgbuild(spec)
   description = spec.summary
   license = spec.license
 
-  md5sum = calc_digest(spec.full_name + '.gem')
+  md5sum = calc_digest(spec.full_name + '.gem', :MD5)
+  sha1sum = calc_digest(spec.full_name + '.gem', :SHA1)
 
   depends = spec.runtime_dependencies
   depends = if depends.empty? then ""
